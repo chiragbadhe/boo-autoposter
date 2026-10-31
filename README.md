@@ -39,4 +39,14 @@ Ask Boo (Claude) for the next carousel: you get the slides as JPEGs plus `captio
 - JPEG only, up to 20 images per carousel; the first image's shape (4:5 here) is used for the whole carousel.
 - Instagram allows far more API posts per day than two, so twice daily is safe.
 - Posts are fully public the moment they publish: check each queued folder before it reaches the front of the queue.
-# boo-autoposter
+
+## Daily content (the studio)
+
+`studio/` is how new posts get made automatically:
+
+- `studio/render.py` turns a short post description into on-brand 1080×1350 JPEGs (Boo, Fredoka, the series colours).
+- `studio/topics.md` is the topic plan, worked through top to bottom. Edit, reorder or add topics any time.
+- `studio/GENERATOR.md` is the procedure the daily Claude run follows: research, write, render, check, push.
+- `studio/log.md` records every generated post and the sources behind it.
+
+The daily run keeps about **3 days of posts queued**. That buffer is your review window: open `queue/` on GitHub, and delete or replace any folder before its turn. Whatever is still there gets posted.
