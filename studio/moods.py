@@ -78,13 +78,13 @@ MOODS = {
     "celebrate": {
         "back": "",
         "front": (
-            _star(-60, 120, 95) + _star(980, 60, 85, "#5AA9F0") + _star(1030, 640, 70, "#A6E8A0")
+            _star(-60, 120, 95) + _star(880, -20, 85, "#5AA9F0") + _star(930, 700, 70, "#A6E8A0")
             + _star(-90, 640, 65, "#F6B6D8")
             + f'<rect x="80" y="-120" width="70" height="34" rx="12" fill="#5AA9F0" stroke="{OL}" stroke-width="{W*0.6}" transform="rotate(-25 100 -110)"/>'
             + f'<rect x="420" y="-170" width="70" height="34" rx="12" fill="#F2A65A" stroke="{OL}" stroke-width="{W*0.6}" transform="rotate(20 440 -160)"/>'
             + f'<rect x="760" y="-120" width="70" height="34" rx="12" fill="#A6E8A0" stroke="{OL}" stroke-width="{W*0.6}" transform="rotate(40 780 -110)"/>'
             + f'<circle cx="260" cy="-60" r="24" fill="#F6B6D8" stroke="{OL}" stroke-width="{W*0.6}"/>'
-            + f'<circle cx="1080" cy="340" r="24" fill="#F2A65A" stroke="{OL}" stroke-width="{W*0.6}"/>'
+            + f'<circle cx="950" cy="330" r="24" fill="#F2A65A" stroke="{OL}" stroke-width="{W*0.6}"/>'
             + f'<circle cx="-120" cy="380" r="24" fill="#5AA9F0" stroke="{OL}" stroke-width="{W*0.6}"/>'
         ),
     },
