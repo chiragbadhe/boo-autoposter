@@ -8,10 +8,18 @@ Exits 2 if any slide's content overflows (shorten the text and rerun).
 post.json:
 {
   "series": "ai" | "web" | "data" | "cloud" | "security" | "careers",
+  "palette": "aqua"   (optional; one of the PALETTES names below)
+          or {"ground": "#hex", "shadow": "#hex", "highlight": "#hex"}
+             (your own colours; shadow and highlight optional; the ground
+              must keep the purple ink readable, else the render stops)
   "slides": [ ...slide objects, 3 to 8... ],
   "caption": "..."
 }
-In any title, wrap the key words in {braces} to highlight them in orange.
+In any title, wrap the key words in {braces} to highlight them in the
+palette's highlight colour.
+Palettes: sunny sky mint peach lilac pink lime aqua coral butter
+(no palette given = the series default: ai sunny, web sky, data mint,
+ cloud peach, security lilac, careers pink).
 
 Slide types (all text fields are plain text):
   cover     tag, title, questions[2-4], bubble
@@ -37,6 +45,21 @@ GROUND = {"ai": "#F9E38A", "web": "#BFE0FB", "data": "#BDEFC9",
           "cloud": "#FFD3B0", "security": "#DCD5FA", "careers": "#FBD0E6"}
 SHADOW = {"ai": "#E2C26F", "web": "#9CC4E8", "data": "#93D3A5",
           "cloud": "#E8B48C", "security": "#B9AEE8", "careers": "#E5A9C6"}
+# name: (ground, floor shadow, highlight, ground for the closing slide)
+PALETTES = {
+    "sunny":  ("#F9E38A", "#E2C26F", "#F2A65A", "sky"),
+    "sky":    ("#BFE0FB", "#9CC4E8", "#F2A65A", "sunny"),
+    "mint":   ("#BDEFC9", "#93D3A5", "#F2A65A", "lilac"),
+    "peach":  ("#FFD3B0", "#E8B48C", "#5AA9F0", "aqua"),
+    "lilac":  ("#DCD5FA", "#B9AEE8", "#F2A65A", "mint"),
+    "pink":   ("#FBD0E6", "#E5A9C6", "#5AA9F0", "butter"),
+    "lime":   ("#DDF2A8", "#BCD782", "#F2A65A", "pink"),
+    "aqua":   ("#B8EEEA", "#8ED3CD", "#F2A65A", "peach"),
+    "coral":  ("#FFC9BD", "#E8A595", "#5AA9F0", "sky"),
+    "butter": ("#FFF1C2", "#E8D493", "#5AA9F0", "lilac"),
+}
+SERIES_PALETTE = {"ai": "sunny", "web": "sky", "data": "mint", "cloud": "peach",
+                  "security": "lilac", "careers": "pink"}
 ACCENTS = ["#F2A65A", "#5AA9F0", "#A6E8A0", "#DCD5FA", "#F9E38A", "#FFD3B0"]
 SERIES_LABEL = {"ai": "AI · explained by Boo", "web": "Web · explained by Boo",
                 "data": "Data · explained by Boo", "cloud": "Cloud · explained by Boo",
@@ -90,7 +113,7 @@ body{margin:0;width:1080px;height:1350px;overflow:hidden}
 .pill{font-size:26px;font-weight:600;background:#fff;border:4px solid %(ol)s;border-radius:999px;padding:8px 24px}
 h1{margin:0;font-size:108px;font-weight:700;line-height:1.02}
 h2{margin:0;font-size:80px;font-weight:700;line-height:1.05}
-.hl{color:%(jk)s;-webkit-text-stroke:4px %(ol)s;paint-order:stroke fill}
+.hl{color:var(--hl);-webkit-text-stroke:4px %(ol)s;paint-order:stroke fill}
 h1 .hl{-webkit-text-stroke:5px %(ol)s}
 .main{flex:1;display:flex;flex-direction:column;justify-content:center;gap:28px;min-height:0}
 .card{background:#fff;border:5px solid %(ol)s;border-radius:36px;padding:26px 32px;box-shadow:0 10px 0 var(--sh)}
@@ -120,7 +143,7 @@ ul.pts li{font-size:34px;line-height:1.3;font-weight:500;display:flex;gap:16px;a
 
 def frame(inner, n, total, series, extra_top=""):
     swipe = "<b>Swipe →</b>" if n < total else "<b>Save this ✦</b>"
-    return f"""<div class="s" style="background:{GROUND[series]};--sh:{SHADOW[series]}">
+    return f"""<div class="s" style="background:{GROUND[series]};--sh:{SHADOW[series]};--hl:{HIGHLIGHT.get(series, JACKET)}">
 <div class="top">{extra_top or '<span></span>'}<span class="pill">{n}/{total}</span></div>
 {inner}
 <div class="foot"><span>{HANDLE}</span>{swipe}</div></div>"""
@@ -178,7 +201,7 @@ def slide_html(sl, n, total, series):
                  f'{col(sl.get("left", {}), "#5AA9F0")}{col(sl.get("right", {}), JACKET)}</div></div>')
         return frame(inner, n, total, series)
     if t == "outro":
-        series = "ai" if series != "ai" else "web"
+        series = "_alt"
         inner = f"""<div class="main" style="align-items:center;text-align:center;justify-content:flex-start;gap:28px">
 <h2 style="font-size:92px">{hl(sl.get('title'))}</h2>
 <p class="body muted" style="max-width:860px">{esc(sl.get('text'))}</p></div>
@@ -186,6 +209,51 @@ def slide_html(sl, n, total, series):
 <div class="bubble" style="position:absolute;left:160px;top:1150px;width:760px;font-size:36px">{esc(sl.get('cta') or 'Follow ' + HANDLE + ' for more')}</div>"""
         return frame(inner, n, total, series)
     raise ValueError(f"Unknown slide type: {t}")
+
+
+HIGHLIGHT = {}
+HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+def luminance(hexcol):
+    c = [int(hexcol[i:i + 2], 16) / 255 for i in (1, 3, 5)]
+    c = [x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4 for x in c]
+    return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+
+def contrast(a, b):
+    la, lb = sorted((luminance(a), luminance(b)), reverse=True)
+    return (la + 0.05) / (lb + 0.05)
+
+
+def darken(hexcol, f=0.86):
+    return "#" + "".join(f"{int(int(hexcol[i:i + 2], 16) * f):02X}" for i in (1, 3, 5))
+
+
+def resolve_palette(pal, series):
+    """Set this post's colours: GROUND/SHADOW/HIGHLIGHT for `series` and `_alt`."""
+    if isinstance(pal, str):
+        if pal not in PALETTES:
+            sys.exit(f"Unknown palette {pal!r}; use one of {', '.join(PALETTES)} or a colour object")
+        ground, shadow, hl, alt = PALETTES[pal]
+        ag, ash, ahl, _ = PALETTES[alt]
+    elif isinstance(pal, dict):
+        ground = pal.get("ground", "")
+        if not HEX.match(ground):
+            sys.exit("palette.ground must be a #RRGGBB colour")
+        shadow = pal.get("shadow") or darken(ground)
+        hl = pal.get("highlight") or JACKET
+        for k, v in (("shadow", shadow), ("highlight", hl)):
+            if not HEX.match(v):
+                sys.exit(f"palette.{k} must be a #RRGGBB colour")
+        # closing slide: sunny, unless the custom ground is already close to it
+        ag, ash, ahl, _ = PALETTES["sky" if contrast(ground, PALETTES["sunny"][0]) < 1.1 else "sunny"]
+    else:
+        sys.exit("palette must be a name or an object")
+    if contrast(ground, INK) < 7 or contrast(ground, MUTED) < 4.5:
+        sys.exit(f"palette ground {ground} is too dark for Boo's purple text; pick a lighter colour")
+    GROUND[series], SHADOW[series], HIGHLIGHT[series] = ground, shadow, hl
+    GROUND["_alt"], SHADOW["_alt"], HIGHLIGHT["_alt"] = ag, ash, ahl
 
 
 def chrome_path():
@@ -219,6 +287,7 @@ def main():
     series = spec.get("series", "ai")
     if series not in GROUND:
         sys.exit(f"Unknown series {series!r}; use one of {', '.join(GROUND)}")
+    resolve_palette(spec.get("palette") or SERIES_PALETTE[series], series)
     slides = spec.get("slides", [])
     if not 3 <= len(slides) <= 8:
         sys.exit("A post needs 3 to 8 slides.")

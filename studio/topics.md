@@ -2,8 +2,16 @@
 
 The daily run takes topics from top to bottom, skipping any whose slug already exists in `queue/` or `posted/` (folder names end in the slug, e.g. `014-what-is-an-api`). Edit freely: reorder, delete, or add lines in the same format. When the list runs out, the run picks new beginner-friendly topics itself, rotating series.
 
-Format: `series | slug | headline question`
+Format: `series | slug | headline question | colours (optional)`
 Series: ai, web, data, cloud, security, careers
+
+Colours (optional 4th column), to choose a post's look yourself:
+- a palette name: sunny, sky, mint, peach, lilac, pink, lime, aqua, coral, butter
+- your own background: `#E7D7FF`, or background plus highlight: `#E7D7FF #5AA9F0`
+  (backgrounds must be light so Boo's purple text stays readable)
+Leave it off and Boo picks a palette that differs from the last few posts.
+
+Example: `ai | what-is-ai | What is AI, really? | aqua`
 
 ai | what-is-ai | What is AI, really?
 web | what-is-an-api | What is an API?

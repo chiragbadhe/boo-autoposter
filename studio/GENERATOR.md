@@ -13,6 +13,14 @@ This file is the procedure for the daily content run. It only ADDS posts to `que
 - Avoid two posts from the same series back to back where the list allows.
 - When the list is used up, pick a new beginner-friendly tech topic yourself, rotating series (ai, web, data, cloud, security, careers), and append it to `topics.md`.
 
+## 2b. Picking colours
+
+Every post gets its own palette, set as `"palette"` in the post JSON.
+
+- If the topic's line in `topics.md` has a fourth column, use it exactly: a palette name, or `#RRGGBB` for the owner's own ground colour (write it as `{"ground": "#RRGGBB"}`, adding `"highlight"` if the line gives a second colour).
+- Otherwise pick from the named palettes in `render.py` (sunny, sky, mint, peach, lilac, pink, lime, aqua, coral, butter): choose one that suits the topic's mood and is **not used by any of the last 4 posts** in the Palette column of `studio/log.md`. Spread them so the feed looks varied.
+- If render.py rejects a colour as too dark, tell the owner in the run summary and use the nearest named palette instead.
+
 ## 3. Writing the post
 
 Audience: curious beginners on Instagram. Boo is a friendly ghost who explains tech simply. Read the Boo design system's README for voice if available; the essentials are below.
@@ -36,6 +44,6 @@ Audience: curious beginners on Instagram. Boo is a friendly ghost who explains t
 
 ## 5. Saving
 
-- Append one line per post to `studio/log.md`: date, folder, series, one-line summary, and the sources you checked.
+- Append one line per post to `studio/log.md`: date, folder, series, palette, one-line summary, and the sources you checked.
 - Commit only new files under `queue/` plus `studio/topics.md` and `studio/log.md`, message `Queue: <folder names>`, and push to the default branch.
 - Never edit `.github/`, `scripts/`, `posted/` or any secret, and never post to Instagram directly.
