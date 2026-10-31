@@ -33,6 +33,8 @@ Audience: curious beginners on Instagram. Boo is a friendly ghost who explains t
   3–5. One to three of `steps` (3–4 steps, title ≤ 22 characters, text ≤ 45 characters, optional tip ≤ 55 characters), `cards` (exactly 4, title ≤ 22, text ≤ 45, icon from the list in `render.py`), `compare` (2–4 items a side, ≤ 30 characters each).
   Last. `outro`: title "Follow {@chirag.zip}", text "Tech explained simply, in cartoons, by Boo.", a cta such as "Save this for later" or "Share with a friend who needs this".
 - **Titles:** ≤ 32 characters for slides 2+, highlight 1–3 words with {braces}.
+- **Boo's moods** (`"mood"` on a slide; props drawn around Boo, see `studio/moods.py`): curious (magnifier, ?), idea (lightbulb), thinking (thought bubble), working (laptop, code tag), study (graduation cap, notes), wow (! marks), celebrate (stars, confetti). Match the mood to what the slide says: a surprising fact → wow, a how-to → working, a learning tip → study, the big answer → idea. Defaults are cover curious, statement idea, outro celebrate; change at least one of them per post so consecutive posts don't repeat the same set.
+- **Small Boo:** add `"boo": true` to 1–2 of the middle slides (steps, cards, compare) for a small Boo beside the title in mood working, study or curious. Never on every slide.
 - **Caption:** a hook line with one emoji, 2–4 short lines that recap the post, a "Swipe through" line, then "Follow @chirag.zip for more tech, explained in cartoons. This page is run by Boo, my AI agent." and 8–12 relevant lowercase hashtags ending with `#chiragzip #boo`. Emoji are fine in captions only.
 
 ## 4. Rendering

@@ -28,10 +28,16 @@ Slide types (all text fields are plain text):
   cards     title, cards[{icon,title,text}] (2-4)
   compare   title, left{label,items[2-4]}, right{label,items[2-4]}
   outro     title, text, cta
+Every slide may set "mood" to change what Boo is doing (see studio/moods.py):
+  curious idea thinking working celebrate study wow
+  Defaults: cover curious, statement idea, outro celebrate.
+  steps/cards/compare show a small Boo beside the title when "boo": true,
+  in mood working, study or curious (default working).
 Icons: chart palette bolt star lock cloud code database search globe cpu
        check link users key bug shield rocket book clock
 """
 import html
+from moods import MOODS, DEFAULT_BY_SLIDE, overlay
 import json
 import os
 import re
@@ -149,11 +155,35 @@ def frame(inner, n, total, series, extra_top=""):
 <div class="foot"><span>{HANDLE}</span>{swipe}</div></div>"""
 
 
-def boo_img(left, top, w, series):
+def boo_img(left, top, w, series, mood=None):
     h = int(w * 1033 / 864)
     sw = int(w * 0.75)
-    return (f'<div class="shadow" style="left:{left + (w - sw)//2}px;top:{top + h + 4}px;width:{sw}px;height:30px;background:{SHADOW[series]}"></div>'
-            f'<img class="boo" src="assets/boo.png" alt="Boo" style="left:{left}px;top:{top}px;width:{w}px;height:{h}px">')
+    sh = max(14, int(30 * w / 370))
+    return (f'<div class="shadow" style="left:{left + (w - sw)//2}px;top:{top + h + 4}px;width:{sw}px;height:{sh}px;background:{SHADOW[series]}"></div>'
+            + overlay("back", mood, left, top, w)
+            + f'<img class="boo" src="assets/boo.png" alt="Boo" style="left:{left}px;top:{top}px;width:{w}px;height:{h}px">'
+            + overlay("front", mood, left, top, w))
+
+
+MINI_MOODS = ("working", "study", "curious")
+
+
+def mood_of(sl):
+    m = sl.get("mood") or DEFAULT_BY_SLIDE.get(sl.get("type"))
+    if m not in MOODS:
+        sys.exit(f"Unknown mood {m!r}; use one of {', '.join(MOODS)}")
+    return m
+
+
+def mini_boo(sl, series):
+    """Small Boo beside the title on steps/cards/compare slides when "boo": true."""
+    if not sl.get("boo"):
+        return "", ""
+    m = mood_of(sl)
+    if m not in MINI_MOODS:
+        m = "working"
+    return boo_img(890, 172, 118, series, m), ' style="padding-right:180px;min-height:170px"'
+
 
 
 def slide_html(sl, n, total, series):
@@ -162,14 +192,14 @@ def slide_html(sl, n, total, series):
         qs = "".join(f'<div class="card q"><b>?</b> {esc(q)}</div>' for q in sl.get("questions", [])[:4])
         inner = f"""<h1>{hl(sl.get('title'))}</h1>
 <div class="main" style="width:560px;justify-content:flex-start">{qs}</div>
-<div class="bubble" style="position:absolute;left:676px;top:600px;width:330px">{esc(sl.get('bubble') or 'Let’s find out!')}</div>
-{boo_img(650, 720, 370, series)}"""
+<div class="bubble" style="position:absolute;left:676px;top:530px;width:330px">{esc(sl.get('bubble') or 'Let’s find out!')}</div>
+{boo_img(650, 740, 350, series, mood_of(sl))}"""
         tag = f'<span class="pill" style="background:#fff">{esc(sl.get("tag") or SERIES_LABEL[series])}</span>'
         return frame(inner, n, total, series, tag)
     if t == "statement":
         pts = sl.get("points") or []
         plist = "".join(f'<li><span class="dot"></span><span>{esc(p)}</span></li>' for p in pts[:4])
-        booblk = boo_img(800, 930, 200, series) if sl.get("boo") else ""
+        booblk = boo_img(800, 930, 200, series, mood_of(sl)) if sl.get("boo") else ""
         inner = f"""<h2>{hl(sl.get('title'))}</h2>
 <div class="main"><div class="card"><p class="body">{esc(sl.get('body'))}</p></div>
 {f'<ul class="pts" style="padding-right:{250 if sl.get("boo") else 0}px">{plist}</ul>' if plist else ''}</div>{booblk}"""
@@ -181,7 +211,8 @@ def slide_html(sl, n, total, series):
             f'<div><p class="st">{esc(s.get("title"))}</p><p class="sx">{esc(s.get("text"))}</p></div></div>'
             for i, s in enumerate(steps))
         tip = f'<div class="tip">{esc(sl["tip"])}</div>' if sl.get("tip") else ""
-        inner = f'<h2>{hl(sl.get("title"))}</h2><div class="main">{rows}{tip}</div>'
+        mb, h2s = mini_boo(sl, series)
+        inner = f'<h2{h2s}>{hl(sl.get("title"))}</h2><div class="main">{rows}{tip}</div>{mb}'
         return frame(inner, n, total, series)
     if t == "cards":
         cards = sl.get("cards", [])[:4]
@@ -191,21 +222,23 @@ def slide_html(sl, n, total, series):
             f'<p class="st" style="font-size:36px;line-height:1.15">{esc(c.get("title"))}</p>'
             f'<p class="sx" style="margin:0">{esc(c.get("text"))}</p></div>'
             for i, c in enumerate(cards))
-        inner = f'<h2>{hl(sl.get("title"))}</h2><div class="main"><div class="grid">{cells}</div></div>'
+        mb, h2s = mini_boo(sl, series)
+        inner = f'<h2{h2s}>{hl(sl.get("title"))}</h2><div class="main"><div class="grid">{cells}</div></div>{mb}'
         return frame(inner, n, total, series)
     if t == "compare":
         def col(side, bg):
             items = "".join(f'<li><span class="dot" style="background:{bg}"></span><span>{esc(x)}</span></li>' for x in side.get("items", [])[:4])
             return f'<div class="card"><p class="lab" style="background:{bg}">{esc(side.get("label"))}</p><ul class="pts">{items}</ul></div>'
-        inner = (f'<h2>{hl(sl.get("title"))}</h2><div class="main"><div class="cmp">'
-                 f'{col(sl.get("left", {}), "#5AA9F0")}{col(sl.get("right", {}), JACKET)}</div></div>')
+        mb, h2s = mini_boo(sl, series)
+        inner = (f'<h2{h2s}>{hl(sl.get("title"))}</h2><div class="main"><div class="cmp">'
+                 f'{col(sl.get("left", {}), "#5AA9F0")}{col(sl.get("right", {}), JACKET)}</div></div>{mb}')
         return frame(inner, n, total, series)
     if t == "outro":
         series = "_alt"
         inner = f"""<div class="main" style="align-items:center;text-align:center;justify-content:flex-start;gap:28px">
 <h2 style="font-size:92px">{hl(sl.get('title'))}</h2>
 <p class="body muted" style="max-width:860px">{esc(sl.get('text'))}</p></div>
-{boo_img(330, 560, 420, series)}
+{boo_img(330, 560, 420, series, mood_of(sl))}
 <div class="bubble" style="position:absolute;left:160px;top:1150px;width:760px;font-size:36px">{esc(sl.get('cta') or 'Follow ' + HANDLE + ' for more')}</div>"""
         return frame(inner, n, total, series)
     raise ValueError(f"Unknown slide type: {t}")
