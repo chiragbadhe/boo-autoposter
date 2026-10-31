@@ -1,0 +1,50 @@
+name: Boo autopost
+
+on:
+  schedule:
+    # Times are UTC. 03:17 and 13:17 UTC = 8:47 AM and 6:47 PM IST.
+    # Change to one line ("17 3 * * *") for once a day.
+    - cron: "17 3 * * *"
+    - cron: "17 13 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (show what would post, post nothing)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: boo-autopost
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish next queued post
+        id: publish
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          GRAPH_HOST: ${{ vars.GRAPH_HOST || 'graph.instagram.com' }}
+          GRAPH_VERSION: ${{ vars.GRAPH_VERSION }}
+          IMAGE_BASE_URL: https://cdn.jsdelivr.net/gh/${{ github.repository }}@${{ github.sha }}
+          DRY_RUN: ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '1' || '0' }}
+        run: python3 scripts/post.py
+
+      - name: Move posted folder out of the queue
+        if: steps.publish.outputs.posted != ''
+        env:
+          POSTED: ${{ steps.publish.outputs.posted }}
+        run: |
+          git config user.name "boo-autopost"
+          git config user.email "boo-autopost@users.noreply.github.com"
+          mkdir -p posted
+          git mv "queue/$POSTED" "posted/$POSTED"
+          git commit -m "Posted $POSTED"
+          git push
