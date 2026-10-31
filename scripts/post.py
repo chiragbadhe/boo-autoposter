@@ -59,6 +59,43 @@ def next_post():
     return None
 
 
+class GraphError(Exception):
+    """A Graph API error, with Meta's message pulled out of the response."""
+    # Codes/subcodes Meta uses for "could not fetch the media" and temporary trouble.
+    RETRY_CODES = {1, 2, 4, 9004, 36000, 36001}
+    RETRY_SUBCODES = {2207003, 2207020, 2207052, 2207001}
+
+    def __init__(self, status, method, path, body):
+        self.status, self.method, self.path, self.body = status, method, path, body
+        try:
+            err = json.loads(body).get("error", {})
+        except ValueError:
+            err = {}
+        self.code = err.get("code")
+        self.subcode = err.get("error_subcode")
+        self.message = err.get("error_user_msg") or err.get("message") or body[:300]
+        self.short = f"code {self.code}" + (f"/{self.subcode}" if self.subcode else "")
+        super().__init__(self.describe())
+
+    @property
+    def retryable(self):
+        return self.code in self.RETRY_CODES or self.subcode in self.RETRY_SUBCODES
+
+    def describe(self):
+        hint = ""
+        if self.code == 190:
+            hint = "\nFix: the access token expired or is invalid. Make a new long-lived token and update the IG_ACCESS_TOKEN secret."
+        elif self.code in (10, 200) or self.code == 3:
+            hint = "\nFix: the token is missing a permission (instagram_content_publish) or the app lacks access."
+        elif self.subcode in self.RETRY_SUBCODES or self.code == 9004:
+            hint = "\nFix: Instagram could not download the image. Open the image link from a dry run to check it loads."
+        elif self.code == 4 or self.code == 32 or self.code == 613:
+            hint = "\nFix: rate limit reached. It will work again on the next run."
+        # Never print the token: Meta's error body does not echo it.
+        return (f"Instagram API error on {self.method} {self.path}\n"
+                f"  HTTP {self.status}, {self.short}\n  Meta says: {self.message}{hint}")
+
+
 class Graph:
     def __init__(self, host, version, token, user_id):
         prefix = f"https://{host}/"
@@ -80,25 +117,55 @@ class Graph:
                 return json.loads(resp.read().decode())
         except urllib.error.HTTPError as err:
             body = err.read().decode(errors="replace")
-            # Never print the token: the body comes from Meta and does not echo it.
-            sys.exit(f"Graph API error {err.code} on {method} {path}: {body}")
+            raise GraphError(err.code, method, path, body) from None
 
-    def create_container(self, params):
-        return self.call("POST", f"{self.user_id}/media", params)["id"]
+    def create_container(self, params, tries=4):
+        """Create a media container, retrying when Meta can't fetch the image yet."""
+        for attempt in range(1, tries + 1):
+            try:
+                return self.call("POST", f"{self.user_id}/media", params)["id"]
+            except GraphError as e:
+                if attempt == tries or not e.retryable:
+                    raise
+                wait = 15 * attempt
+                print(f"  Instagram couldn't take the image yet ({e.short}); retrying in {wait}s", flush=True)
+                time.sleep(wait)
 
     def wait_ready(self, container_id, timeout=300):
         deadline = time.time() + timeout
         while time.time() < deadline:
-            status = self.call("GET", container_id, {"fields": "status_code"}).get("status_code")
+            info = self.call("GET", container_id, {"fields": "status_code,status"})
+            status = info.get("status_code")
             if status == "FINISHED":
                 return
             if status in ("ERROR", "EXPIRED"):
-                sys.exit(f"Container {container_id} failed with status {status}")
+                sys.exit(f"Instagram could not process an image ({status}): {info.get('status', 'no details')}")
             time.sleep(5)
         sys.exit(f"Container {container_id} not ready after {timeout}s")
 
     def publish(self, container_id):
         return self.call("POST", f"{self.user_id}/media_publish", {"creation_id": container_id})["id"]
+
+
+def check_images(urls):
+    """Fetch every image once: warms the CDN and fails early with a clear message."""
+    for u in urls:
+        for attempt in range(1, 5):
+            try:
+                req = urllib.request.Request(u, headers={"User-Agent": "boo-autopost"})
+                with urllib.request.urlopen(req, timeout=60) as resp:
+                    ctype = resp.headers.get("Content-Type", "")
+                    resp.read()
+                if resp.status == 200 and "jpeg" in ctype:
+                    break
+                problem = f"HTTP {resp.status}, type {ctype or 'unknown'}"
+            except urllib.error.URLError as e:
+                problem = str(getattr(e, "code", "") or e.reason)
+            if attempt == 4:
+                sys.exit(f"Image not reachable for Instagram: {u}\n  ({problem}). "
+                         "Check that the repo is public and the file is a JPEG.")
+            time.sleep(10 * attempt)
+    print(f"  All {len(urls)} images reachable.", flush=True)
 
 
 def main():
@@ -113,13 +180,15 @@ def main():
     if len(urls) > 20:
         sys.exit(f"{folder}: {len(urls)} images; Instagram carousels hold at most 20.")
 
-    print(f"Next post: {folder} ({len(urls)} image{'s' if len(urls) != 1 else ''})")
+    print(f"Next post: {folder} ({len(urls)} image{'s' if len(urls) != 1 else ''})", flush=True)
     if env("DRY_RUN") == "1":
         for u in urls:
             print("  image:", u)
         print("  caption:", (caption[:80] + "…") if len(caption) > 80 else caption)
         print("DRY_RUN=1, nothing posted.")
         return
+
+    check_images(urls)
 
     graph = Graph(
         env("GRAPH_HOST", "graph.instagram.com"),
@@ -150,4 +219,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except GraphError as e:
+        sys.exit(str(e))
