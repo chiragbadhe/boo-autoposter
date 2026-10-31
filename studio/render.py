@@ -7,7 +7,8 @@ Exits 2 if any slide's content overflows (shorten the text and rerun).
 
 post.json:
 {
-  "series": "ai" | "web" | "data" | "cloud" | "security" | "careers",
+  "series": "ai" | "dsa" | "web" | "sysdesign" | "security" | "blockchain"
+            | "data" | "cloud" | "careers",
   "palette": "aqua"   (optional; one of the PALETTES names below)
           or {"ground": "#hex", "shadow": "#hex", "highlight": "#hex"}
              (your own colours; shadow and highlight optional; the ground
@@ -65,11 +66,17 @@ PALETTES = {
     "butter": ("#FFF1C2", "#E8D493", "#5AA9F0", "lilac"),
 }
 SERIES_PALETTE = {"ai": "sunny", "web": "sky", "data": "mint", "cloud": "peach",
-                  "security": "lilac", "careers": "pink"}
+                  "security": "lilac", "careers": "pink", "dsa": "lime",
+                  "sysdesign": "aqua", "blockchain": "coral"}
+for _s, _p in SERIES_PALETTE.items():          # every series gets a default ground
+    GROUND.setdefault(_s, PALETTES[_p][0])
+    SHADOW.setdefault(_s, PALETTES[_p][1])
 ACCENTS = ["#F2A65A", "#5AA9F0", "#A6E8A0", "#DCD5FA", "#F9E38A", "#FFD3B0"]
 SERIES_LABEL = {"ai": "AI · explained by Boo", "web": "Web · explained by Boo",
                 "data": "Data · explained by Boo", "cloud": "Cloud · explained by Boo",
-                "security": "Security · explained by Boo", "careers": "Careers · tips from Boo"}
+                "security": "Security · explained by Boo", "careers": "Careers · tips from Boo",
+                "dsa": "DSA · explained by Boo", "sysdesign": "System design · by Boo",
+                "blockchain": "Blockchain · explained by Boo"}
 
 ICONS = {
     "chart": '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
@@ -318,8 +325,8 @@ def main():
     with open(spec_path, encoding="utf-8") as fh:
         spec = json.load(fh)
     series = spec.get("series", "ai")
-    if series not in GROUND:
-        sys.exit(f"Unknown series {series!r}; use one of {', '.join(GROUND)}")
+    if series not in SERIES_PALETTE:
+        sys.exit(f"Unknown series {series!r}; use one of {', '.join(SERIES_PALETTE)}")
     resolve_palette(spec.get("palette") or SERIES_PALETTE[series], series)
     slides = spec.get("slides", [])
     if not 3 <= len(slides) <= 8:

@@ -11,7 +11,13 @@ This file is the procedure for the daily content run. It only ADDS posts to `que
 
 - Take topics from `studio/topics.md` from the top, skipping any slug that already appears at the end of a folder name in `queue/` or `posted/`.
 - Avoid two posts from the same series back to back where the list allows.
-- When the list is used up, pick a new beginner-friendly tech topic yourself, rotating series (ai, web, data, cloud, security, careers), and append it to `topics.md`.
+- When the list is used up, pick a new beginner-friendly tech topic yourself, rotating series (ai, dsa, web, sysdesign, security, blockchain, data, cloud, careers), and append it to `topics.md`.
+
+### Series notes
+- **dsa:** teach the idea with a tiny worked example (5–7 items, a real-life analogy such as a stack of plates), state the time complexity in Big O once and say what it means in words. No code walls; at most one short line of pseudocode in a card.
+- **sysdesign:** start from a familiar app ("when 1 million people open Instagram at once…"), name the component, show where it sits in the request path, end with the trade-off it brings.
+- **blockchain:** explain the technology only. No prices, no predictions, no "should you buy", no investment or financial advice, no promotion of specific coins or projects. Mention risks (scams, irreversible transfers) where relevant.
+- **careers:** practical, honest advice; no promises of jobs or salaries; no invented statistics.
 
 ## 2b. Picking colours
 
