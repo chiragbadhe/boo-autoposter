@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Boo autopost: publish the next queued post to Instagram.
 
-Each post is a folder in queue/ (processed in name order) holding:
+Each post is a folder in queue/ (processed in name order) holding either:
   01.jpg, 02.jpg, ...   1 image = single post, 2-20 images = carousel (JPEG only)
+or
+  reel.mp4              a Reel (vertical 9:16 MP4, H.264 + AAC)
+  cover.jpg             the Reel's cover image (optional)
+plus
   caption.txt           the caption (optional)
 
 Images are fetched by Meta from a public URL, built from IMAGE_BASE_URL.
@@ -48,14 +52,18 @@ def next_post():
     )
     for folder in folders:
         path = os.path.join(QUEUE, folder)
-        images = sorted(f for f in os.listdir(path) if f.lower().endswith(IMAGE_EXT))
+        files = os.listdir(path)
+        caption = ""
+        caption_file = os.path.join(path, "caption.txt")
+        if os.path.exists(caption_file):
+            with open(caption_file, encoding="utf-8") as fh:
+                caption = fh.read().strip()
+        if "reel.mp4" in files:
+            cover = "cover.jpg" if "cover.jpg" in files else None
+            return folder, "reel", ["reel.mp4"], caption, cover
+        images = sorted(f for f in files if f.lower().endswith(IMAGE_EXT))
         if images:
-            caption_file = os.path.join(path, "caption.txt")
-            caption = ""
-            if os.path.exists(caption_file):
-                with open(caption_file, encoding="utf-8") as fh:
-                    caption = fh.read().strip()
-            return folder, images, caption
+            return folder, "images", images, caption, None
     return None
 
 
@@ -131,7 +139,7 @@ class Graph:
                 print(f"  Instagram couldn't take the image yet ({e.short}); retrying in {wait}s", flush=True)
                 time.sleep(wait)
 
-    def wait_ready(self, container_id, timeout=300):
+    def wait_ready(self, container_id, timeout=600):
         deadline = time.time() + timeout
         while time.time() < deadline:
             info = self.call("GET", container_id, {"fields": "status_code,status"})
@@ -156,16 +164,16 @@ def check_images(urls):
                 with urllib.request.urlopen(req, timeout=60) as resp:
                     ctype = resp.headers.get("Content-Type", "")
                     resp.read()
-                if resp.status == 200 and "jpeg" in ctype:
+                if resp.status == 200 and ("jpeg" in ctype or "mp4" in ctype):
                     break
                 problem = f"HTTP {resp.status}, type {ctype or 'unknown'}"
             except urllib.error.URLError as e:
                 problem = str(getattr(e, "code", "") or e.reason)
             if attempt == 4:
                 sys.exit(f"Image not reachable for Instagram: {u}\n  ({problem}). "
-                         "Check that the repo is public and the file is a JPEG.")
+                         "Check that the repo is public and the file is a JPEG or MP4.")
             time.sleep(10 * attempt)
-    print(f"  All {len(urls)} images reachable.", flush=True)
+    print(f"  All {len(urls)} files reachable.", flush=True)
 
 
 def main():
@@ -173,14 +181,18 @@ def main():
     if not found:
         print("Queue is empty: nothing to post.")
         return
-    folder, images, caption = found
+    folder, kind, images, caption, cover = found
     base_url = env("IMAGE_BASE_URL", required=True).rstrip("/")
-    urls = [f"{base_url}/queue/{urllib.parse.quote(folder)}/{urllib.parse.quote(img)}" for img in images]
+    def url_of(name):
+        return f"{base_url}/queue/{urllib.parse.quote(folder)}/{urllib.parse.quote(name)}"
+    urls = [url_of(img) for img in images]
+    cover_url = url_of(cover) if cover else None
 
     if len(urls) > 20:
         sys.exit(f"{folder}: {len(urls)} images; Instagram carousels hold at most 20.")
 
-    print(f"Next post: {folder} ({len(urls)} image{'s' if len(urls) != 1 else ''})", flush=True)
+    what = "reel" if kind == "reel" else f"{len(urls)} image{'s' if len(urls) != 1 else ''}"
+    print(f"Next post: {folder} ({what})", flush=True)
     if env("DRY_RUN") == "1":
         for u in urls:
             print("  image:", u)
@@ -188,7 +200,7 @@ def main():
         print("DRY_RUN=1, nothing posted.")
         return
 
-    check_images(urls)
+    check_images(urls + ([cover_url] if cover_url else []))
 
     graph = Graph(
         env("GRAPH_HOST", "graph.instagram.com"),
@@ -197,7 +209,13 @@ def main():
         env("IG_USER_ID", required=True),
     )
 
-    if len(urls) == 1:
+    if kind == "reel":
+        params = {"media_type": "REELS", "video_url": urls[0], "caption": caption, "share_to_feed": "true"}
+        if cover_url:
+            params["cover_url"] = cover_url
+        container = graph.create_container(params)
+        print("  Reel uploaded; waiting for Instagram to process the video…", flush=True)
+    elif len(urls) == 1:
         container = graph.create_container({"image_url": urls[0], "caption": caption})
     else:
         children = []
