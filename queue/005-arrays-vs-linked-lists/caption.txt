@@ -1,4 +1,4 @@
-Boo! 👻 Did I scare you? Arrays vs linked lists in 45 seconds 🧱🔗
+Arrays vs linked lists, explained by Boo in 40 seconds 👻🧱🔗
 
 📦 Array: items sit side by side, so jumping to any index is instant, O(1). Inserting in the middle means shifting everything after it, O(n).
 🔗 Linked list: each node points to the next. Finding an item means walking the links, O(n), but once you're there, inserting is just changing two arrows, O(1).
