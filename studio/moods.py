@@ -112,7 +112,8 @@ MOODS = {
 }
 
 DEFAULT_BY_SLIDE = {"cover": "curious", "statement": "idea", "steps": "working",
-                    "cards": "thinking", "compare": "thinking", "outro": "celebrate"}
+                    "cards": "thinking", "compare": "thinking", "outro": "celebrate",
+                    "single": "idea", "quiz": "thinking", "answer": "celebrate"}
 
 PAD = 260
 

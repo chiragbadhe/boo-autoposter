@@ -30,6 +30,10 @@ Long-lived Instagram tokens last about 60 days. Before then, refresh it in the M
 
 The workflow wakes at five possible slots a day (9:13 AM, 11:52 AM, 2:26 PM, 5:38 PM, 8:44 PM IST). `scripts/slot.py` picks 1, 2 or 3 of them at random each day (weights 30/45/25 %) and waits a random 0–25 minutes before posting, so the feed doesn't look automated. Skipped slots show as green runs that did nothing. To change slots, edit the `cron` lines in `.github/workflows/post.yml` (UTC; IST = UTC + 5:30) and copy them into its `SLOTS` list; to change how many posts a day, edit `WEIGHTS` in `scripts/slot.py`. GitHub can start scheduled runs a few minutes late, and pauses schedules in repos with no activity for 60 days; each post's commit counts as activity.
 
+## Post formats
+
+Posts rotate between four formats so the feed never repeats itself: one-shot (1 image), quiz duo (question + answer), quick bite (3 slides) and deep dive (5–7 slides). `studio/render.py` supports all of them (slide types `single`, `quiz`, `answer` plus the originals); the rules are in `studio/GENERATOR.md`.
+
 ## Adding posts
 
 Ask Boo (Claude) for the next carousel: you get the slides as JPEGs plus `caption.txt`. Put them in a new numbered folder in `queue/` and commit. Keep a few days of posts queued.

@@ -13,7 +13,7 @@ post.json:
           or {"ground": "#hex", "shadow": "#hex", "highlight": "#hex"}
              (your own colours; shadow and highlight optional; the ground
               must keep the purple ink readable, else the render stops)
-  "slides": [ ...slide objects, 3 to 8... ],
+  "slides": [ ...slide objects, 1 to 10 (see FORMATS in GENERATOR.md)... ],
   "caption": "..."
 }
 In any title, wrap the key words in {braces} to highlight them in the
@@ -29,6 +29,9 @@ Slide types (all text fields are plain text):
   cards     title, cards[{icon,title,text}] (2-4)
   compare   title, left{label,items[2-4]}, right{label,items[2-4]}
   outro     title, text, cta
+  single    tag (optional), title, body, points[0-3]   (a whole post in one image)
+  quiz      tag (optional), title (the question), options[4], bubble (optional)
+  answer    title (optional, default "The answer"), answer, body, points[0-3]
 Every slide may set "mood" to change what Boo is doing (see studio/moods.py):
   curious idea thinking working celebrate study wow
   Defaults: cover curious, statement idea, outro celebrate.
@@ -155,9 +158,10 @@ ul.pts li{font-size:34px;line-height:1.3;font-weight:500;display:flex;gap:16px;a
 
 
 def frame(inner, n, total, series, extra_top=""):
-    swipe = "<b>Swipe →</b>" if n < total else "<b>Save this ✦</b>"
+    swipe = "<b>Swipe →</b>" if n < total else ("<b>Follow for more ✦</b>" if total == 1 else "<b>Save this ✦</b>")
+    counter = f'<span class="pill">{n}/{total}</span>' if total > 1 else ""
     return f"""<div class="s" style="background:{GROUND[series]};--sh:{SHADOW[series]};--hl:{HIGHLIGHT.get(series, JACKET)}">
-<div class="top">{extra_top or '<span></span>'}<span class="pill">{n}/{total}</span></div>
+<div class="top">{extra_top or '<span></span>'}{counter}</div>
 {inner}
 <div class="foot"><span>{HANDLE}</span>{swipe}</div></div>"""
 
@@ -248,6 +252,32 @@ def slide_html(sl, n, total, series):
 {boo_img(330, 560, 420, series, mood_of(sl))}
 <div class="bubble" style="position:absolute;left:160px;top:1150px;width:760px;font-size:36px">{esc(sl.get('cta') or 'Follow ' + HANDLE + ' for more')}</div>"""
         return frame(inner, n, total, series)
+    if t == "single":
+        pts = sl.get("points") or []
+        plist = "".join(f'<li><span class="dot"></span><span>{esc(p)}</span></li>' for p in pts[:3])
+        inner = f"""<h1 style="font-size:92px">{hl(sl.get('title'))}</h1>
+<div class="main" style="justify-content:flex-start"><div class="card"><p class="body">{esc(sl.get('body'))}</p></div>
+{f'<ul class="pts" style="padding-right:330px">{plist}</ul>' if plist else ''}</div>
+{boo_img(690, 770, 320, series, mood_of(sl))}"""
+        tag = f'<span class="pill" style="background:#fff">{esc(sl.get("tag") or SERIES_LABEL[series])}</span>'
+        return frame(inner, n, total, series, tag)
+    if t == "quiz":
+        opts = "".join(f'<div class="card q"><b>{"ABCD"[i]}.</b> {esc(o)}</div>' for i, o in enumerate(sl.get("options", [])[:4]))
+        inner = f"""<h1 style="font-size:84px">{hl(sl.get('title'))}</h1>
+<div class="main" style="width:600px;justify-content:flex-start">{opts}</div>
+<div class="bubble" style="position:absolute;left:700px;top:560px;width:310px">{esc(sl.get('bubble') or 'Comment your answer!')}</div>
+{boo_img(690, 790, 320, series, mood_of(sl))}"""
+        tag = f'<span class="pill" style="background:#fff">{esc(sl.get("tag") or "Quiz · " + SERIES_LABEL[series].split(" ·")[0])}</span>'
+        return frame(inner, n, total, series, tag)
+    if t == "answer":
+        pts = sl.get("points") or []
+        plist = "".join(f'<li><span class="dot"></span><span>{esc(p)}</span></li>' for p in pts[:3])
+        inner = f"""<h2>{hl(sl.get('title') or 'The answer')}</h2>
+<div class="main" style="justify-content:flex-start"><div class="card" style="background:#F9E38A"><p class="st" style="font-size:46px">{esc(sl.get('answer'))}</p></div>
+<div class="card"><p class="body">{esc(sl.get('body'))}</p></div>
+{f'<ul class="pts" style="padding-right:290px">{plist}</ul>' if plist else ''}</div>
+{boo_img(760, 930, 240, series, mood_of(sl))}"""
+        return frame(inner, n, total, series)
     raise ValueError(f"Unknown slide type: {t}")
 
 
@@ -329,8 +359,8 @@ def main():
         sys.exit(f"Unknown series {series!r}; use one of {', '.join(SERIES_PALETTE)}")
     resolve_palette(spec.get("palette") or SERIES_PALETTE[series], series)
     slides = spec.get("slides", [])
-    if not 3 <= len(slides) <= 8:
-        sys.exit("A post needs 3 to 8 slides.")
+    if not 1 <= len(slides) <= 10:
+        sys.exit("A post needs 1 to 10 slides.")
     os.makedirs(out_dir, exist_ok=True)
 
     from playwright.sync_api import sync_playwright

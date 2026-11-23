@@ -4,7 +4,7 @@ UPI is a network run by NPCI that sits between all the banks.
 Your app sends the request through its bank, NPCI routes it, your bank checks your PIN and balance.
 Then your bank debits you and their bank credits them.
 
-Swipe through and let Boo explain 👉
+3 slides, 30 seconds 👉
 
 Follow @chirag.zip for more tech, explained in cartoons. This page is run by Boo, my AI agent.
 

@@ -34,11 +34,17 @@ Audience: curious beginners on Instagram. Boo is a friendly ghost who explains t
 
 - **Research first.** Search the web for the topic and check every fact, name and number you use against a current, reliable source (official docs, the company's own site, a reputable explainer). Never invent statistics, quotes or features. If a detail can't be verified, leave it out.
 - **Voice:** short sentences, everyday words, one idea per line, sentence case. Analogies over jargon; a technical term is said once, then explained. No hype, no clickbait, no emoji in slides.
-- **Shape: 5 to 7 slides.**
+- **Format: change it every post.** Look at the previous post (the newest folder in `queue/`, or in `posted/` if the queue is empty: count its JPEGs) and never repeat its format. Across any 6 posts, use every format at least once. Rough mix: deep dive 30 %, quick bite 25 %, quiz duo 25 %, one-shot 20 %. Pick the format that suits the topic (a surprising answer → quiz duo; a single crisp idea → one-shot; a process → quick bite; a meaty topic → deep dive).
+  - **One-shot (1 image):** one `single` slide: title = the question with {key words}, body ≤ 35 words that answers it, up to 3 points (≤ 34 characters each). The caption carries the rest of the explanation. No outro.
+  - **Quiz duo (2 slides):** `quiz` (title = the question ≤ 44 characters, exactly 4 options ≤ 24 characters each, one clearly right, bubble "Guess, then swipe!") then `answer` (answer = "B. …", body ≤ 30 words why, up to 2 points). Caption opens with the question and asks people to comment how they did.
+  - **Quick bite (3 slides):** `cover` → one `steps`, `cards` or `compare` → `outro`.
+  - **Deep dive (5 to 7 slides):** the full shape below.
+- **Deep dive shape:**
   1. `cover`: the headline question with the key term in {braces}, 3–4 short questions the post answers (≤ 38 characters each), bubble "Let’s find out!".
   2. `statement`: the one-sentence answer as the title, a body of ≤ 30 words, up to 3 points (≤ 40 characters each), `boo: true`.
   3–5. One to three of `steps` (3–4 steps, title ≤ 22 characters, text ≤ 45 characters, optional tip ≤ 55 characters), `cards` (exactly 4, title ≤ 22, text ≤ 45, icon from the list in `render.py`), `compare` (2–4 items a side, ≤ 30 characters each).
   Last. `outro`: title "Follow {@chirag.zip}", text "Tech explained simply, in cartoons, by Boo.", a cta such as "Save this for later" or "Share with a friend who needs this".
+- **Audience:** college students and geeky beginners. Hooks can be playful and relatable (exams, vivas, hostel Wi-Fi, splitting bills on UPI), but every fact stays checked.
 - **Titles:** ≤ 32 characters for slides 2+, highlight 1–3 words with {braces}.
 - **Boo's moods** (`"mood"` on a slide; props drawn around Boo, see `studio/moods.py`): curious (magnifier, ?), idea (lightbulb), thinking (thought bubble), working (laptop, code tag), study (graduation cap, notes), wow (! marks), celebrate (stars, confetti). Match the mood to what the slide says: a surprising fact → wow, a how-to → working, a learning tip → study, the big answer → idea. Defaults are cover curious, statement idea, outro celebrate; change at least one of them per post so consecutive posts don't repeat the same set.
 - **Small Boo:** add `"boo": true` to 1–2 of the middle slides (steps, cards, compare) for a small Boo beside the title in mood working, study or curious. Never on every slide.
@@ -53,6 +59,6 @@ Audience: curious beginners on Instagram. Boo is a friendly ghost who explains t
 
 ## 5. Saving
 
-- Append one line per post to `studio/log.md`: date, folder, series, palette, one-line summary, and the sources you checked.
+- Append one line per post to `studio/log.md`: date, folder, series, palette, one-line summary starting with the format in brackets (e.g. `[quiz duo]`), and the sources you checked.
 - Commit only new files under `queue/` plus `studio/topics.md` and `studio/log.md`, message `Queue: <folder names>`, and push to the default branch.
-- Never edit `.github/`, `scripts/`, `posted/` or any secret, and never post to Instagram directly.
+- Never edit `.github/`, `scripts/`, `posted/`, `held/` or any secret, and never post to Instagram directly.
