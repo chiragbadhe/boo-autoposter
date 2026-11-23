@@ -11,138 +11,50 @@ Colours (optional 4th column), to choose a post's look yourself:
   (backgrounds must be light so Boo's purple text stays readable)
 Leave it off and Boo picks a palette that differs from the last few posts.
 
-Example: `ai | what-is-ai | What is AI, really? | aqua`
+Example: `ai | how-ai-images-work | How do AI image generators work? | aqua`
 
-The list below rotates through all nine series (about 108 posts, roughly 54 days at two a day).
+Rebooted 2026-11-23: the old explainer list is retired. These are "wait, how does that work?" topics about apps and things college students use every day. Same series rotation, so the colours and tags stay varied.
 
 ## Round 1
-ai | what-is-ai | What is AI, really?
-dsa | what-is-big-o | What is Big O notation?
-web | what-is-an-api | What is an API?
-sysdesign | what-is-system-design | What is system design?
-security | what-is-2fa | What is two-factor authentication?
-blockchain | what-is-blockchain | What is a blockchain?
-data | what-is-a-database | What is a database?
-cloud | what-is-the-cloud | What is “the cloud”?
-careers | first-tech-job | How do you land your first tech job?
+data | how-shazam-works | How does Shazam know the song in 5 seconds?
+sysdesign | how-upi-works | How does UPI send money in 2 seconds?
+dsa | why-0-1-plus-0-2 | Why is 0.1 + 0.2 not 0.3 in code?
+ai | how-ai-images-work | How do AI image generators work?
+security | how-passwords-get-cracked | How do hackers crack passwords?
+web | what-happens-when-you-google | What happens when you hit Enter on Google?
+cloud | how-netflix-streams | How does Netflix stream without buffering?
+blockchain | what-is-a-hash | What is a hash, and why does crypto need it?
+careers | what-is-vibe-coding | What is vibe coding?
 
 ## Round 2
-ai | how-chatgpt-works | How does a chatbot like ChatGPT work?
-dsa | arrays-vs-linked-lists | Arrays vs linked lists
-web | what-is-a-domain | What is a domain name?
-sysdesign | what-is-a-load-balancer | What is a load balancer?
-security | what-is-phishing | What is phishing?
-blockchain | how-bitcoin-works | How does Bitcoin work?
-data | what-is-sql | What is SQL?
-cloud | what-is-a-server | What is a server?
-careers | learn-to-code-path | Where should you start learning to code?
+ai | how-spotify-knows-you | How does Spotify know your music taste?
+sysdesign | how-tatkal-crashes | Why do ticket sites crash at Tatkal time?
+security | how-whatsapp-encryption-works | How does WhatsApp keep chats private?
+data | how-google-maps-knows-traffic | How does Google Maps know about traffic?
+web | how-qr-codes-work | How does a QR code work?
+dsa | why-arrays-start-at-0 | Why do programmers count from 0?
+cloud | why-games-lag | Why do online games lag?
+ai | how-deepfakes-work | How do deepfakes work?
+careers | how-to-win-a-hackathon | How do you win a hackathon?
 
 ## Round 3
-ai | what-is-rag | What is RAG?
-dsa | what-is-a-stack | What is a stack?
-web | how-websites-load | What happens when you open a website?
-sysdesign | what-is-caching | What is caching?
-security | password-managers | Why use a password manager?
-blockchain | public-vs-private-keys | Public vs private keys
-data | what-is-json | What is JSON?
-cloud | what-is-an-ip-address | What is an IP address?
-careers | avoid-tutorial-hell | How do you escape tutorial hell?
+security | how-face-id-works | How does Face ID know it’s you?
+web | how-gps-finds-you | How does GPS find you?
+sysdesign | how-ipl-streaming-scales | How do apps stream to millions at once?
+ai | how-ai-agents-work | How does an AI agent actually do tasks?
+dsa | how-autocomplete-works | How does your keyboard predict the next word?
+data | how-instagram-feed-works | How does Instagram pick your feed?
+cloud | what-happens-when-you-delete | What happens when you delete a file?
+blockchain | what-is-a-51-attack | What if someone controls half a blockchain?
+careers | open-source-for-students | How can students get into open source?
 
 ## Round 4
-ai | what-are-tokens | What are tokens in AI?
-dsa | what-is-a-queue | What is a queue?
-web | frontend-vs-backend | Frontend vs backend: what’s the difference?
-sysdesign | horizontal-vs-vertical-scaling | Horizontal vs vertical scaling
-security | what-is-encryption | What is encryption?
-blockchain | what-is-a-crypto-wallet | What is a crypto wallet?
-data | spreadsheet-vs-database | Spreadsheet vs database
-cloud | what-is-linux | What is Linux?
-careers | build-a-portfolio | How do you build a tech portfolio?
-
-## Round 5
-ai | what-is-a-neural-network | What is a neural network?
-dsa | what-is-a-hash-map | What is a hash map?
-web | what-is-https | What does the padlock in HTTPS mean?
-sysdesign | sql-vs-nosql | SQL vs NoSQL databases
-security | hashing-vs-encryption | Hashing vs encryption
-blockchain | what-is-ethereum | What is Ethereum?
-data | what-is-an-index | Why do databases need indexes?
-cloud | iaas-paas-saas | IaaS vs PaaS vs SaaS
-careers | github-profile-tips | How do you make your GitHub stand out?
-
-## Round 6
-ai | what-are-embeddings | What are embeddings?
-dsa | binary-search | How does binary search work?
-web | what-is-dns | What is DNS?
-sysdesign | what-is-a-message-queue | What is a message queue?
-security | what-is-a-vpn | What does a VPN actually do?
-blockchain | what-are-smart-contracts | What are smart contracts?
-data | what-is-a-vector-database | What is a vector database?
-cloud | what-is-docker | What is Docker?
-careers | prepare-for-dsa-interviews | How do you prepare for DSA interviews?
-
-## Round 7
-ai | what-is-an-ai-agent | What is an AI agent?
-dsa | what-is-recursion | What is recursion?
-web | what-is-git | What is Git?
-sysdesign | monolith-vs-microservices | Monolith vs microservices
-security | what-are-passkeys | What are passkeys?
-blockchain | proof-of-work-vs-stake | Proof of work vs proof of stake
-data | what-is-normalization | What is database normalization?
-cloud | what-is-serverless | What does “serverless” mean?
-careers | resume-for-tech | What makes a tech resume stand out?
-
-## Round 8
-ai | what-is-hallucination | Why do AI chatbots make things up?
-dsa | what-is-a-tree | What is a tree in DSA?
-web | what-is-a-cdn | What is a CDN?
-sysdesign | what-is-an-api-gateway | What is an API gateway?
-security | what-are-cookies | What are browser cookies?
-blockchain | what-is-gas-fee | What is a gas fee?
-data | what-is-etl | What is ETL?
-cloud | what-is-devops | What is DevOps?
-careers | open-source-contributions | How do you start contributing to open source?
-
-## Round 9
-ai | what-is-mcp | What is MCP (Model Context Protocol)?
-dsa | what-is-a-graph | What is a graph in DSA?
-web | rest-vs-graphql | REST vs GraphQL
-sysdesign | what-is-rate-limiting | What is rate limiting?
-security | what-is-ransomware | What is ransomware?
-blockchain | what-is-a-stablecoin | What is a stablecoin?
-data | what-is-a-data-warehouse | What is a data warehouse?
-cloud | what-is-ci-cd | What is CI/CD?
-careers | system-design-interview-tips | How do you approach a system design interview?
-
-## Round 10
-ai | what-is-fine-tuning | What is fine-tuning?
-dsa | bfs-vs-dfs | BFS vs DFS
-web | what-are-webhooks | What are webhooks?
-sysdesign | what-is-sharding | What is database sharding?
-security | what-is-sql-injection | What is SQL injection?
-blockchain | what-is-an-nft | What is an NFT, technically?
-data | what-is-big-data | What is big data?
-cloud | what-is-kubernetes | What is Kubernetes?
-careers | linkedin-for-developers | How should developers use LinkedIn?
-
-## Round 11
-ai | open-vs-closed-models | Open vs closed AI models
-dsa | sorting-algorithms | How do sorting algorithms work?
-web | what-is-localhost | What is localhost?
-sysdesign | what-is-cap-theorem | What is the CAP theorem?
-security | what-is-a-firewall | What is a firewall?
-blockchain | what-is-defi | What is DeFi?
-data | what-is-data-science | What is data science?
-cloud | what-is-terraform | What is Terraform?
-careers | frontend-vs-backend-career | Frontend or backend: which career fits you?
-
-## Round 12
-ai | what-is-computer-vision | What is computer vision?
-dsa | dynamic-programming | What is dynamic programming?
-web | what-is-react | What is React?
-sysdesign | design-a-url-shortener | How would you design a URL shortener?
-security | what-is-zero-trust | What is zero trust security?
-blockchain | what-is-web3 | What is Web3?
-data | what-is-csv | What is a CSV file?
-cloud | what-is-edge-computing | What is edge computing?
-careers | freelancing-in-tech | How do you start freelancing in tech?
+ai | how-ai-voice-cloning-works | How does AI copy a voice?
+security | what-is-the-dark-web | What is the dark web, really?
+web | how-wifi-works | How does Wi-Fi go through walls?
+sysdesign | how-uber-surge-works | How does surge pricing decide the price?
+dsa | how-git-stores-history | How does Git remember every change?
+cloud | how-cpus-work | How does a CPU think with on/off switches?
+data | how-captcha-works | How does a CAPTCHA know you’re human?
+ai | how-self-driving-cars-see | How do self-driving cars see the road?
+careers | build-in-public | Why should you build in public?

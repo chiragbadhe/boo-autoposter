@@ -1,11 +1,11 @@
 # Daily generator: how Boo's content gets made
 
-This file is the procedure for the daily content run. It only ADDS posts to `queue/`. Posting is done separately by the GitHub Actions workflow, which takes the oldest folder twice a day.
+This file is the procedure for the daily content run. It only ADDS posts to `queue/`. Posting is done separately by the GitHub Actions workflow, which takes the oldest folder 1 to 3 times a day (random, about 2 on average).
 
 ## 1. How many posts to make
 
-- Count the folders in `queue/`. Keep **6 queued** (3 days at two posts a day): make `6 − count` new posts, at most 3 in one run. If 6 or more are queued, make none and stop.
-- The 3-day buffer is the owner's review window: anything they delete or edit in `queue/` before its turn never goes out as generated.
+- Count the folders in `queue/`. Keep **8 queued** (about 3–4 days, since a day can post up to 3): make `8 − count` new posts, at most 4 in one run. If 8 or more are queued, make none and stop.
+- That buffer is the owner's review window: anything they delete or edit in `queue/` before its turn never goes out as generated.
 
 ## 2. Picking topics
 
@@ -18,6 +18,7 @@ This file is the procedure for the daily content run. It only ADDS posts to `que
 - **sysdesign:** start from a familiar app ("when 1 million people open Instagram at once…"), name the component, show where it sits in the request path, end with the trade-off it brings.
 - **blockchain:** explain the technology only. No prices, no predictions, no "should you buy", no investment or financial advice, no promotion of specific coins or projects. Mention risks (scams, irreversible transfers) where relevant.
 - **careers:** practical, honest advice; no promises of jobs or salaries; no invented statistics.
+- **security (and any post):** never show a fake or look-alike web address, email address or login prompt in a slide, even as an example of a scam (e.g. "amazan.com"). Instagram's filters reject such images as phishing (error 2207032), which blocks the whole queue. Describe tricks in words instead ("a name with one letter swapped").
 
 ## 2b. Picking colours
 

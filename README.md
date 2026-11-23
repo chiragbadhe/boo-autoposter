@@ -1,6 +1,6 @@
 # Boo autopost
 
-Posts the next carousel from `queue/` to Instagram twice a day (8:47 AM and 6:47 PM IST), using GitHub Actions and the Instagram API. Nothing runs on your computer.
+Posts the next carousel from `queue/` to Instagram 1 to 3 times a day at varying times, using GitHub Actions and the Instagram API. Nothing runs on your computer.
 
 ## How it works
 
@@ -28,7 +28,7 @@ Long-lived Instagram tokens last about 60 days. Before then, refresh it in the M
 
 ## Changing the schedule
 
-Edit the two `cron` lines in `.github/workflows/post.yml` (times are UTC; IST = UTC + 5:30). One line = once a day. GitHub can start scheduled runs a few minutes late, and pauses schedules in repos with no activity for 60 days; each post's commit counts as activity.
+The workflow wakes at five possible slots a day (9:13 AM, 11:52 AM, 2:26 PM, 5:38 PM, 8:44 PM IST). `scripts/slot.py` picks 1, 2 or 3 of them at random each day (weights 30/45/25 %) and waits a random 0–25 minutes before posting, so the feed doesn't look automated. Skipped slots show as green runs that did nothing. To change slots, edit the `cron` lines in `.github/workflows/post.yml` (UTC; IST = UTC + 5:30) and copy them into its `SLOTS` list; to change how many posts a day, edit `WEIGHTS` in `scripts/slot.py`. GitHub can start scheduled runs a few minutes late, and pauses schedules in repos with no activity for 60 days; each post's commit counts as activity.
 
 ## Adding posts
 
@@ -37,7 +37,8 @@ Ask Boo (Claude) for the next carousel: you get the slides as JPEGs plus `captio
 ## Rules this follows
 
 - JPEG only, up to 20 images per carousel; the first image's shape (4:5 here) is used for the whole carousel.
-- Instagram allows far more API posts per day than two, so twice daily is safe.
+- Instagram allows far more API posts per day than three, so this is safe.
+- A post Instagram keeps rejecting blocks everything behind it. Move it to `held/` to unblock the queue.
 - Posts are fully public the moment they publish: check each queued folder before it reaches the front of the queue.
 
 ## Daily content (the studio)
@@ -49,4 +50,4 @@ Ask Boo (Claude) for the next carousel: you get the slides as JPEGs plus `captio
 - `studio/GENERATOR.md` is the procedure the daily Claude run follows: research, write, render, check, push.
 - `studio/log.md` records every generated post and the sources behind it.
 
-The daily run keeps about **3 days of posts queued**. That buffer is your review window: open `queue/` on GitHub, and delete or replace any folder before its turn. Whatever is still there gets posted.
+The daily run keeps about **8 posts queued** (3–4 days). That buffer is your review window: open `queue/` on GitHub, and delete or replace any folder before its turn. Whatever is still there gets posted.
